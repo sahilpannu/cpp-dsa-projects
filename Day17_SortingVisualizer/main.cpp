@@ -1,0 +1,7 @@
+// Entry point for the project
+#include <iostream>
+
+int main() {
+    std::cout << "SortingVisualizer running..." << std::endl;
+    return 0;
+}
