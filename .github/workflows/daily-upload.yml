@@ -1,0 +1,36 @@
+name: Daily Project Upload
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Every day at 6:00 AM UTC
+  workflow_dispatch:     # Also allows manual run
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine Today's Folder
+        id: get_folder
+        run: |
+          day=$(date +%d)
+          folder=$(ls | grep "Day${day}")
+          echo "folder=$folder" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push Today's Folder
+        run: |
+          folder=${{ steps.get_folder.outputs.folder }}
+          if [ -d "$folder" ]; then
+            git add "$folder"
+            git commit -m "Add project for today: $folder"
+            git push
+          else
+            echo "No folder found for today."
